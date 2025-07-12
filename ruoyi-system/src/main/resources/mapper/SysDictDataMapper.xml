@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysDictDataMapper">
+    <!--普通-->
+    <resultMap id="SysDictDataResultMap" type="SysDictData">
+        <id property="dataId" column="id" />
+        <result property="dictId" column="dict_id" />
+        <result property="code" column="code" />
+        <result property="label" column="label" />
+        <result property="value" column="value" />
+        <result property="isDefault" column="is_default" />
+        <result property="status" column="status" />
+        <result property="sort" column="sort" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!--sql语句-->
+    <sql id="selectDictDataVo">
+        SELECT
+            id,dict_id,code,label,value,is_default,status,sort,created_at,updated_at
+        FROM
+            sys_dict_data
+    </sql>
+
+    <!--查找字典数据列表-->
+    <select id="selectDictDataList" parameterType="SysDictData" resultMap="SysDictDataResultMap">
+        <include refid="selectDictDataVo"/>
+        <where>
+            <if test="label != null">
+                AND label like concat('%', #{label}, '%')
+            </if>
+            <if test="dictId != null">
+                AND dict_id = #{dictId}
+            </if>
+            <if test="value != null">
+                AND value = #{value}
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectDataListByDictCode" parameterType="String" resultMap="SysDictDataResultMap">
+        <include refid="selectDictDataVo"/>
+        <where>
+            <if test="code != null">
+                AND code = #{code}
+            </if>
+        </where>
+    </select>
+
+    <select id="findDictDataById" resultMap="SysDictDataResultMap">
+        <include refid="selectDictDataVo" />
+        where id = #{id}
+    </select>
+
+    <insert id="insertDictData" parameterType="SysDictData">
+        insert into sys_dict_data(
+            <if test="dictId != null">dict_id,</if>
+            <if test="code != null">code,</if>
+            <if test="label != null and label != ''">label,</if>
+            <if test="value != null and value != ''">value,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="status != null">status,</if>
+            <if test="sort != null">sort,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            created_at,
+            updated_at
+        )values(
+            <if test="dictId != null and dictId != ''">#{dictId},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="label != null and label != ''">#{label},</if>
+            <if test="value != null and value != ''">#{value},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateDictData" parameterType="SysDictData">
+        update sys_dict_data
+        <set>
+            <if test="dictData.dictId != null ">dict_id = #{dictData.dictId},</if>
+            <if test="dictData.code != null ">code = #{dictData.code},</if>
+            <if test="dictData.label != null and dictData.label != ''">label = #{dictData.label},</if>
+            <if test="dictData.value != null and dictData.value != ''">value = #{dictData.value},</if>
+            <if test="dictData.isDefault != null">is_default = #{dictData.isDefault},</if>
+            <if test="dictData.status != null">status = #{dictData.status},</if>
+            <if test="dictData.sort != null">sort = #{dictData.sort},</if>
+            <if test="dictData.remark != null">remark = #{dictData.remark},</if>
+            updated_at = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--清空默认值-->
+    <update id="clearDictDataDefault" parameterType="String">
+        update sys_dict_data set is_default = 0,updated_at = sysdate() where code = #{code}
+    </update>
+
+    <!--设置默认值-->
+    <update id="setDictDataDefault" parameterType="Long">
+        update sys_dict_data set is_default = 1,updated_at = sysdate()  where id = #{id}
+    </update>
+
+    <delete id="deleteDictDataById" parameterType="Long">
+        delete from sys_dict_data where id = #{id}
+    </delete>
+
+    <delete id="deleteDictDataByIds">
+        delete from sys_dict_data where id in
+        <foreach collection="array" item="dictId" open="(" separator="," close=")">
+            #{dictId}
+        </foreach>
+    </delete>
+
+
+</mapper>

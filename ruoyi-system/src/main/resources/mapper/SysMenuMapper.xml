@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMenuMapper">
+    <!--普通菜单-->
+    <resultMap id="SysMenuResultMap" type="sysMenu">
+        <id property="menuId" column="id" />
+        <result property="name" column="name" />
+        <result property="type" column="type" />
+        <result property="locale" column="locale" />
+        <result property="path" column="path" />
+        <result property="parentId" column="parent_id" />
+        <result property="target" column="target" />
+        <result property="icon" column="icon" />
+        <result property="sort" column="sort" />
+        <result property="visible" column="visible" />
+        <result property="status" column="status" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!--关联菜单-->
+    <resultMap id="SysMenuWidthRoleRelationResultMap" type="sysMenu">
+        <id property="menuId" column="id" />
+        <result property="name" column="name" />
+        <result property="type" column="type" />
+        <result property="locale" column="locale" />
+        <result property="path" column="path" />
+        <result property="parentId" column="parent_id" />
+        <result property="target" column="target" />
+        <result property="icon" column="icon" />
+        <result property="sort" column="sort" />
+        <result property="visible" column="visible" />
+        <result property="status" column="status" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <collection  property="roles"   javaType="java.util.List"  resultMap="SysRoleResult" column="id" />
+    </resultMap>
+
+    <!--角色列表-->
+    <resultMap id="SysRoleResult" type="SysRole">
+        <id property="roleId" column="role_id" />
+        <result property="name" column="role_name" />
+        <result property="slug" column="role_slug" />
+        <result property="sort" column="role_sort" />
+        <result property="status" column="role_status" />
+        <result property="createdAt" column="role_created_at" />
+        <result property="updatedAt" column="role_updated_at" />
+    </resultMap>
+
+    <!--sql语句-->
+    <sql id="selectMenuVo">
+        select
+            id,name,type,locale,path,parent_id,target,icon,sort,visible,status,created_at,updated_at
+        from
+            sys_menu
+    </sql>
+
+    <!--菜单与角色关联关系-->
+    <sql id="selectMenuRoleRelationVo">
+        SELECT
+            m.`id`,m.`name`,m.`type`,m.`locale`,m.`path`,m.`parent_id`,m.`target`,m.`icon`,m.`sort`,m.`visible`,m.`status`,m.`created_at`,m.`updated_at`,
+            r.id role_id,r.name role_name,r.slug role_slug,r.sort role_sort,r.`status` role_status,r.`remark` role_remark,r.`created_at` role_created_at,r.`updated_at` role_updated_at
+        FROM
+            sys_menu m
+        LEFT JOIN sys_role_menu rm ON rm.`menu_id` = m.`id`
+        LEFT JOIN sys_role r ON r.`id` = rm.`role_id`
+    </sql>
+
+    <!--菜单与用户关系关系-->
+    <sql id="selectMenuUserRelationVo">
+        select
+            DISTINCT m.`id`,m.`name`,m.`type`,m.`locale`,m.`path`,m.`parent_id`,m.`target`,m.`icon`,m.`sort`,m.`status`,m.`created_at`,m.`updated_at`
+        from
+            sys_menu m
+        left join sys_role_menu rm on rm.`menu_id` = m.`id`
+        left join sys_role ro on rm.`role_id` = ro.`id`
+        left join sys_role_user ru on ru.role_id = ro.`id`
+    </sql>
+
+
+    <!--查询所有菜单列表-->
+    <select id="selectMenuList" parameterType="SysMenu" resultMap="SysMenuResultMap">
+        <include refid="selectMenuVo"/>
+        <where>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by sort
+    </select>
+
+
+    <!--查询当前用户的系统菜单列表-->
+    <select id="findMenuListByUserId" resultMap="SysMenuResultMap">
+        <include refid="selectMenuUserRelationVo" />
+        where
+            ru.`user_id` = #{userId}
+        order by sort asc
+    </select>
+
+    <!--查询当前菜单-->
+    <select id="findMenuById" parameterType="Long" resultMap="SysMenuWidthRoleRelationResultMap">
+        <include refid="selectMenuRoleRelationVo"/>
+        where
+            m.id = #{id}
+    </select>
+
+    <!--插入菜单-->
+    <insert id="insertMenu" parameterType="SysMenu">
+        insert into sys_menu (
+            <if test="name != null and name != ''">name,</if>
+            <if test="type != null">type,</if>
+            <if test="locale != null and locale != ''">locale,</if>
+            <if test="path != null and path != ''">path,</if>
+            <if test="parentId != null and parentId != 0">parent_id,</if>
+            <if test="target != null and target != ''">target,</if>
+            <if test="icon != null and icon != ''">icon,</if>
+            <if test="sort != null">sort,</if>
+            <if test="visible != null">visible,</if>
+            <if test="status != null">status,</if>
+            created_at,
+            updated_at
+        ) values (
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="locale != null and locale != ''">#{locale},</if>
+            <if test="path != null and path != ''">#{path},</if>
+            <if test="parentId != null and parentId != 0">#{parentId},</if>
+            <if test="target != null and target != ''">#{target},</if>
+            <if test="icon != null and icon != ''">#{icon},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="visible != null">#{visible},</if>
+            <if test="status != null">#{status},</if>
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+    <!--更新菜单-->
+    <update id="updateMenu">
+        update sys_menu
+        <set>
+            <if test="menu.name != null and menu.name != ''">name = #{menu.name},</if>
+            <if test="menu.type != null">type = #{menu.type},</if>
+            <if test="menu.locale != null and menu.locale != ''">locale = #{menu.locale},</if>
+            <if test="menu.path != null and menu.path != ''">path = #{menu.path},</if>
+            <if test="menu.parentId != null and menu.parentId != ''">parent_id = #{menu.parentId},</if>
+            <if test="menu.target != null">target = #{menu.target},</if>
+            <if test="menu.icon != null and menu.icon != ''">icon = #{menu.icon},</if>
+            <if test="menu.sort != null and menu.sort != ''">sort = #{menu.sort},</if>
+            <if test="menu.visible != null">visible = #{menu.visible},</if>
+            <if test="menu.status != null and menu.status != 0">status = #{menu.status},</if>
+            updated_at = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--更改菜单状态-->
+    <update id="updateMenuVisible">
+        update sys_menu
+            set visible = #{menu.visible}
+        where
+            id = #{id}
+    </update>
+
+    <!--删除单个-->
+    <delete id="deleteMenuById">
+
+    </delete>
+
+    <!--删除多个-->
+    <delete id="deleteMenuByIds">
+
+    </delete>
+</mapper>

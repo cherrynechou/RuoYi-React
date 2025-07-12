@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysRoleUserMapper">
+
+    <resultMap id="SysUserRoleResultMap" type="SysRoleUser" >
+        <result property="userId"     column="user_id"      />
+        <result property="roleId"     column="role_id"      />
+        <result property="createdAt"  column="created_at"  />
+        <result property="updatedAt"  column="updated_at"  />
+    </resultMap>
+
+    <sql id="selectUserRoleVo">
+        SELECT
+            `role_id`,`user_id`,`created_at`,`updated_at`
+        from
+            `sys_role_user`
+    </sql>
+
+    <select id="selectUserRoleListByUserId" parameterType="Long" resultMap="SysUserRoleResultMap">
+        <include refid="selectUserRoleVo" />
+        where
+            user_id = #{id}
+    </select>
+
+    <delete id="deleteUserRoleByUserId" parameterType="Long">
+        delete from sys_role_user where user_id=#{userId}
+    </delete>
+
+    <select id="countUserRoleByRoleId" resultType="Integer">
+        select count(1) from sys_role_user where role_id=#{roleId}
+    </select>
+
+    <!--批量插入-->
+    <insert id="batchInsertUserRole">
+        insert into sys_role_user (user_id, role_id,created_at,updated_at) values
+        <foreach item="roleId" index="index" collection="roleIds" separator=",">
+            (#{userId},#{roleId},sysdate(),sysdate())
+        </foreach>
+    </insert>
+
+    <!--批量删除-->
+    <delete id="deleteUserRole">
+        delete from sys_role_user where user_id = #{userId} and role_id in
+        <foreach  item="roleId" collection="roleIds" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+
+</mapper>

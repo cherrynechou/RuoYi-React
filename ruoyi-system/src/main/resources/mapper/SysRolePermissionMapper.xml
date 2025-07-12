@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysRolePermissionMapper">
+
+    <resultMap id="SysRoleMenuResultMap" type="SysRolePermission" >
+        <result property="roleId"           column="role_id"      />
+        <result property="permissionId"     column="permission_id"      />
+        <result property="createdAt"        column="created_at"  />
+        <result property="updatedAt"        column="updated_at"  />
+    </resultMap>
+
+    <sql id="selectRolePermissionVo">
+        SELECT
+            `role_id`,`permission_id`,`created_at`,`updated_at`
+        FROM
+            `sys_role_permission`
+    </sql>
+
+    <select id="selectRolePermissionListByRoleId" parameterType="Long" resultMap="SysRoleMenuResultMap">
+        <include refid="selectRolePermissionVo" />
+        where
+            role_id = #{id}
+    </select>
+
+    <!--批量插入-->
+    <insert id="batchInsertRolePermission">
+        insert into sys_role_permission (role_id,permission_id,created_at,updated_at) values
+        <foreach item="permissionId" index="index" collection="permissionIds" separator=",">
+            (#{roleId},#{permissionId},sysdate(),sysdate())
+        </foreach>
+    </insert>
+
+    <!--批量删除-->
+    <delete id="deleteRolePermission">
+        delete from sys_role_permission where role_id = #{roleId} and permission_id in
+        <foreach  item="permissionId" collection="permissionIds" open="(" separator="," close=")">
+            #{permissionId}
+        </foreach>
+    </delete>
+
+</mapper>

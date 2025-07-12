@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysDictMapper">
+    <!--普通-->
+    <resultMap id="SysDictResultMap" type="SysDict">
+        <id property="dictId" column="id" />
+        <result property="name" column="name" />
+        <result property="code" column="code" />
+        <result property="type" column="type" />
+        <result property="status" column="status" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!--关联字典-->
+    <resultMap id="SysDictWithDataRelationResultMap" type="SysDict">
+        <id property="dictId" column="id" />
+        <result property="name" column="name" />
+        <result property="code" column="code" />
+        <result property="type" column="type" />
+        <result property="status" column="status" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <collection  property="dataList" ofType="SysDictData"  resultMap="SysDictDataResult" column="id"/>
+    </resultMap>
+
+    <resultMap id="SysDictDataResult" type="SysDictData">
+        <id property="dataId" column="data_id" />
+        <result property="dictId" column="dict_id"  />
+        <result property="label" column="label" />
+        <result property="value" column="value" />
+        <result property="isDefault" column="is_default" />
+        <result property="sort" column="data_sort" />
+        <result property="status" column="data_status" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="data_created_at" />
+        <result property="updatedAt" column="data_updated_at" />
+    </resultMap>
+
+    <!--sql语句-->
+    <sql id="selectDictVo">
+        select
+            id,name,code,type,status,remark,created_at,updated_at
+        from
+            sys_dict
+    </sql>
+
+    <!--关联表sql-->
+    <sql id="selectDictWithDataRelationVo">
+        SELECT
+            t.`id`,t.`name`,t.`code`,t.`type`,t.`status`,t.`remark`,t.`created_at`,t.`updated_at`,
+            d.`id` data_id,d.`dict_id`,d.`label`,d.`value`,d.`is_default`,d.`status` data_status,d.`sort` data_sort,
+            d.created_at data_created_at,d.updated_at data_updated_at
+        FROM
+            sys_dict t
+        LEFT JOIN
+            sys_dict_data d on t.`id` = d.`dict_id`
+        ORDER BY
+            d.sort ASC
+    </sql>
+
+    <select id="selectDictWithDataList" parameterType="String" resultMap="SysDictWithDataRelationResultMap">
+        <include refid="selectDictWithDataRelationVo"/>
+        <where>
+            <if test="code != null">
+                AND code = #{code}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDictList" parameterType="SysDict" resultMap="SysDictResultMap">
+        <include refid="selectDictVo"/>
+        <where>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name}, '%')
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDictAll" resultMap="SysDictResultMap">
+        <include refid="selectDictVo"/>
+    </select>
+
+    <select id="findDictById" parameterType="Long" resultMap="SysDictResultMap">
+        <include refid="selectDictVo"/>
+        where
+            id = #{id}
+    </select>
+
+    <insert id="insertDict" parameterType="SysDict">
+        insert into sys_dict(
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            created_at,
+            updated_at
+        )values(
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+
+    <update id="updateDict" parameterType="SysDict">
+        update sys_dict
+        <set>
+            <if test="dict.name != null and dict.name != ''">name = #{dict.name},</if>
+            <if test="dict.code != null and dict.code != ''">code = #{dict.code},</if>
+            <if test="dict.type != null and dict.type != ''">type = #{dict.type},</if>
+            <if test="dict.status != null">status = #{dict.status},</if>
+            <if test="dict.remark != null">remark = #{dict.remark},</if>
+            updated_at = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDictById" parameterType="Long">
+        delete from sys_dict where id = #{id}
+    </delete>
+
+    <delete id="deleteDictByIds">
+
+    </delete>
+
+</mapper>

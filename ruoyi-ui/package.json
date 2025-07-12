@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "author": "cherrynechou <iboy_2008@163.com>",
+  "scripts": {
+    "dev": "cross-env REACT_APP_ENV=dev MOCK=none UMI_ENV=dev NODE_ENV=development max dev",
+    "build": "cross-env UMI_ENV=prod NODE_ENV=production max build",
+    "format": "prettier --cache --write .",
+    "prepare": "husky",
+    "postinstall": "max setup",
+    "setup": "max setup",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.0.1",
+    "@ant-design/pro-components": "^2.4.4",
+    "@umijs/max": "^4.4.11",
+    "ahooks": "^3.9.0",
+    "antd": "^5.4.0",
+    "antd-style": "^3.7.1",
+    "classnames": "^2.5.1",
+    "dayjs": "^1.11.13",
+    "exceljs": "^4.4.0",
+    "jsencrypt": "^3.3.2",
+    "localforage": "^1.10.0",
+    "lodash-es": "^4.17.21",
+    "nanoid": "^5.1.5",
+    "rc-menu": "^9.16.1",
+    "rc-tabs": "^15.6.1"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "cross-env": "^7.0.3",
+    "husky": "^9",
+    "lint-staged": "^13.2.0",
+    "prettier": "^2.8.7",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "prettier-plugin-packagejson": "^2.4.3",
+    "typescript": "^5.0.3"
+  }
+}

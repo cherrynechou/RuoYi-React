@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysPermissionMapper">
+    <!-- 权限列表 -->
+    <resultMap id="SysPermissionResultMap" type="SysPermission">
+        <id property="permissionId" column="id" />
+        <result property="name" column="name" />
+        <result property="locale" column="locale" />
+        <result property="slug" column="slug" />
+        <result property="type" column="type" />
+        <result property="parentId" column="parent_id" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!--sql语句-->
+    <sql id="selectPermissionVo">
+        select
+            id,name,locale,slug,parent_id,type,sort,created_at,updated_at
+        from
+            sys_permission
+    </sql>
+
+
+    <!--找到所有权限-->
+    <select id="selectPermissionList" resultMap="SysPermissionResultMap">
+        <include refid="selectPermissionVo" />
+    </select>
+
+    <!--当前权限id-->
+    <select id="findPermissionById" resultMap="SysPermissionResultMap">
+        <include refid="selectPermissionVo" />
+        where
+            id = #{permissionId}
+    </select>
+
+    <!--插入权限-->
+    <insert id="insertPermission">
+        insert into sys_permission (
+            <if test="id != null and id != 0">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="locale != null and locale != ''">locale,</if>
+            <if test="slug != null and slug != ''">slug,</if>
+            <if test="type != null">type,</if>
+            <if test="parentId != null and parentId != 0">parent_id,</if>
+            <if test="sort != null and sort != 0">sort,</if>
+            created_at,
+            updated_at
+        ) values (
+            <if test="id != null and id != 0">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="locale != null and locale != ''">#{locale},</if>
+            <if test="slug != null and slug != ''">#{slug},</if>
+            <if test="type != null">#{type},</if>
+            <if test="parentId != null and parentId != 0">#{parentId},</if>
+            <if test="sort != null and sort != 0">#{sort},</if>
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+    <!--更新权限-->
+    <update id="updatePermission" >
+        update sys_permission
+        <set>
+            <if test="permission.name != null and permission.name != ''">name = #{permission.name},</if>
+            <if test="permission.locale != null and permission.locale != ''">locale = #{permission.locale},</if>
+            <if test="permission.type != null and permission.type != 0">type = #{permission.type},</if>
+            <if test="permission.slug != null and permission.slug != ''">slug = #{permission.slug},</if>
+            <if test="permission.parentId != null and permission.parentId != 0">parent_id = #{permission.parentId},</if>
+            <if test="permission.sort != null and permission.sort != ''">sort = #{permission.sort},</if>
+            updated_at = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePermissionById">
+
+    </delete>
+
+    <delete id="deletePermissionByIds">
+
+    </delete>
+</mapper>

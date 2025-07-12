@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
+
+    <!--用户列表-->
+    <resultMap id="SysUserResultMap" type="SysUser">
+        <id property="userId" column="id" />
+        <result property="userName" column="username" />
+        <result property="password" column="password" />
+        <result property="nickName" column="nickname" />
+        <result property="email" column="email" />
+        <result property="telephone" column="telephone" />
+        <result property="sex" column="sex" />
+        <result property="avatar" column="avatar" />
+        <result property="status" column="status" />
+        <result property="loginCount" column="login_count" />
+        <result property="lastLoginIp" column="last_login_ip" />
+        <result property="lastLoginTime" column="last_login_time" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!--用户角色关联列表-->
+    <resultMap id="SysUserWithRoleRelationResultMap" type="SysUser">
+        <id property="userId" column="id" />
+        <result property="userName" column="username" />
+        <result property="password" column="password" />
+        <result property="nickName" column="nickname" />
+        <result property="email" column="email" />
+        <result property="telephone" column="telephone" />
+        <result property="sex" column="sex" />
+        <result property="avatar" column="avatar" />
+        <result property="status" column="status" />
+        <result property="loginCount" column="login_count" />
+        <result property="lastLoginIp" column="last_login_ip" />
+        <result property="lastLoginTime" column="last_login_time" />
+        <result property="remark" column="remark" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <collection  property="roles" ofType="SysRole"  resultMap="SysRoleResult" column="id"/>
+    </resultMap>
+
+    <!--角色列表-->
+    <resultMap id="SysRoleResult" type="SysRole">
+        <id property="roleId" column="role_id" />
+        <result property="name" column="role_name" />
+        <result property="slug" column="role_slug" />
+        <result property="sort" column="role_sort" />
+        <result property="status" column="role_status" />
+        <result property="createdAt" column="role_created_at" />
+        <result property="updatedAt" column="role_updated_at" />
+    </resultMap>
+
+    <!--sql语句-->
+    <sql id="selectUserVo">
+        select
+            id,username,password,nickname,email,telephone,sex,avatar,status,sort,login_count,last_login_ip,last_login_time,remark,created_at,updated_at
+        from
+            sys_user
+    </sql>
+
+    <sql id="selectUserWithRoleRelationVo">
+        SELECT
+            u.`id`,u.`username`,u.`password`,u.`nickname`,u.`email`,u.`telephone`,u.`sex`,u.`avatar`,u.`status`,u.`sort`,u.`login_count`,u.`last_login_ip`,u.`last_login_time`,u.`remark`,
+            u.`created_at`,u.`updated_at`,
+            r.`id` role_id,r.`name` role_name,r.`slug` role_slug,r.`sort` role_sort,r.`status` role_status,r.`created_at` role_created_at,r.`updated_at` role_updated_at
+        FROM
+            sys_user u
+        LEFT JOIN
+            sys_role_user ru ON ru.`user_id` = u.`id`
+        LEFT JOIN
+            sys_role r ON r.`id` = ru.`role_id`
+    </sql>
+
+    <!--查询所有用户-->
+    <select id="selectUserList" parameterType="SysUser" resultMap="SysUserWithRoleRelationResultMap">
+        <include refid="selectUserWithRoleRelationVo"/>
+        where u.deleted_at is null
+        <if test="userName != null and userName != ''">
+            AND u.username like concat('%', #{username}, '%')
+        </if>
+    </select>
+
+    <!--查询用户-->
+    <select id="findUserById" parameterType="Long" resultMap="SysUserWithRoleRelationResultMap">
+        <include refid="selectUserWithRoleRelationVo"/>
+        where
+            u.deleted_at is null and u.id = #{id}
+    </select>
+
+    <!--查询用户-->
+    <select id="findUserByUserName" parameterType="String" resultMap="SysUserResultMap">
+        <include refid="selectUserVo"/>
+        where deleted_at is null
+        <if test="userName != null and userName != ''">
+            AND username like concat('%', #{username}, '%')
+        </if>
+    </select>
+
+    <!--只查询用户 id 用户名-->
+    <select id="checkUserNameUnique" parameterType="string"  resultMap="SysUserResultMap">
+        select
+            id, username
+        from
+            sys_user
+        where
+            username = #{userName} and deleted_at is null limit 1
+    </select>
+
+    <select id="checkPhoneUnique" resultMap="SysUserResultMap">
+        select
+            id,username
+        from
+            sys_user
+        where
+            phone = #{phone} limit 1
+    </select>
+
+    <!--插入用户-->
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+        insert into sys_user(
+            <if test="userId != null and userId != 0">id,</if>
+            <if test="userName != null and userName != ''">username,</if>
+            <if test="password != null and password != ''">password,</if>
+            <if test="nickname != null and nickname != ''">nickname,</if>
+            <if test="email != null and email != ''">email,</if>
+            <if test="telephone != null and telephone != ''">telephone,</if>
+            <if test="sex != null and sex != 0">sex,</if>
+            <if test="avatar != null and avatar != ''">avatar,</if>
+            <if test="status != null">status,</if>
+            <if test="loginCount != null and loginCount != 0">login_count,</if>
+            <if test="lastLoginIp != null and lastLoginIp != ''">last_login_ip,</if>
+            <if test="lastLoginTime != null and lastLoginTime != ''">last_login_time,</if>
+            <if test="sort != null and sort != ''">sort,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            created_at,
+            updated_at
+        ) values (
+            <if test="userId != null and userId != 0">#{userId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="password != null and password != ''">#{password},</if>
+            <if test="nickname != null and nickname != ''">#{nickname},</if>
+            <if test="email != null and email != ''">#{email},</if>
+            <if test="telephone != null and telephone != ''">#{telephone},</if>
+            <if test="sex != null and sex != 0">#{sex},</if>
+            <if test="avatar != null and avatar != ''">#{avatar},</if>
+            <if test="status != null">#{status},</if>
+            <if test="loginCount != null and loginCount != 0">#{loginCount},</if>
+            <if test="lastLoginIp != null and lastLoginIp != ''">#{lastLoginIp},</if>
+            <if test="lastLoginTime != null and lastLoginTime != ''">#{lastLoginTime},</if>
+            <if test="sort != null and sort != ''">#{sort},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+    <!--更新用户-->
+    <update id="updateUser" parameterType="SysUser">
+        update sys_user
+        <set>
+            <if test="user.userName != null and user.userName != ''">username = #{user.userName},</if>
+            <if test="user.password != null and user.password != ''">password = #{user.password},</if>
+            <if test="user.nickname != null and user.nickname != ''">name = #{user.nickname},</if>
+            <if test="user.email != null ">email = #{user.email},</if>
+            <if test="user.telephone != null ">telephone = #{user.telephone},</if>
+            <if test="user.sex != null">sex = #{user.sex},</if>
+            <if test="user.avatar != null and user.avatar != ''">avatar = #{user.avatar},</if>
+            <if test="user.status != null">status = #{user.status},</if>
+            <if test="user.loginCount != null and user.loginCount != ''">login_count = #{user.loginCount},</if>
+            <if test="user.lastLoginIp != null and user.lastLoginIp != ''">last_login_ip = #{user.lastLoginIp},</if>
+            <if test="user.lastLoginTime != null">last_login_time = #{user.lastLoginTime},</if>
+            <if test="user.remark != null">remark = #{user.remark},</if>
+            updated_at = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--更新用户状态-->
+    <update id="updateUserStatus" parameterType="SysUser">
+        update
+            sys_user
+        set
+            status = #{status}
+        where
+            id = #{id}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Long">
+        update
+            sys_user
+        set
+            deleted_at = sysdate()
+        where
+            id = #{id}
+    </delete>
+
+    <delete id="deleteUserByIds">
+
+    </delete>
+
+</mapper>

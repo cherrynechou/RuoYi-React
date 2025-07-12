@@ -1,0 +1,8 @@
+.fz(@n, @i: 1) when (@i <= @n) {
+  // 外边距
+  .antd-font-size-@{i} {
+    font-size: (@i * 1px) !important;
+  }
+  .fz(@n, (@i + 1));
+}
+.fz(70);
