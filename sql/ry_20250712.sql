@@ -243,7 +243,7 @@ CREATE TABLE `sys_user` (
 /*Data for the table `sys_user` */
 
 insert  into `sys_user`(`id`,`username`,`password`,`nickname`,`email`,`telephone`,`sex`,`avatar`,`status`,`login_count`,`last_login_ip`,`last_login_time`,`remark`,`sort`,`created_at`,`updated_at`,`deleted_at`) values 
-(1,'admin','$2a$10$4g/hT6/gZzBUnG.DHQQC0eCG9JP1Li6MPcdCGXlYvUtsTchINSJ5W','Administrator','','',0,'','\0',1,'192.168.1.20','2025-07-12 10:55:00',NULL,0,'2024-12-22 03:34:02','2025-07-12 10:55:00',NULL);
+(1,'admin','$2a$10$lODdnJNhQkNazFckLZ4UIO.1CGPjsbHu9qXv8HKk9IS1YEVnrjeSa','Administrator','','',0,'','\0',1,'192.168.1.20','2025-07-12 10:55:00',NULL,0,'2024-12-22 03:34:02','2025-07-12 10:55:00',NULL);
 
 /*Table structure for table `sys_user_menu` */
 
