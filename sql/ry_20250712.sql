@@ -310,6 +310,47 @@ insert into `sys_permission` (`id`, `name`, `locale`, `slug`, `type`, `parent_id
 
 /*Data for the table `sys_user_permission` */
 
+
+-- ----------------------------
+-- 部门表
+-- ----------------------------
+drop table if exists sys_dept;
+create table sys_dept (
+  `id`                      bigint          not null auto_increment    comment '部门id',
+  `parent_id`               bigint          default 0                  comment '父部门id',
+  `code`                    varchar(64)     not null                   comment '部门编码',
+  `name`                    varchar(30)     default ''                 comment '部门名称',
+  `sort`                    smallint        default 0                  comment '显示顺序',
+  `status`                  bit(1)          DEFAULT b'0' NOT NULL      comment '部门状态（0正常 1停用）',
+  `created_at`              DATETIME                                   COMMENT '创建时间',
+  `updated_at`              DATETIME                                   COMMENT '更新时间',
+  `deleted_at`              DATETIME        null default null          comment '删除时间',
+  primary key (`id`),
+  UNIQUE KEY `dept_code_unique` (`code`)
+) engine=innodb AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci comment = '部门表';
+
+-- ----------------------------
+-- 岗位信息表
+-- ----------------------------
+drop table if exists sys_post;
+create table sys_post
+(
+    `id`                    bigint            not null auto_increment     comment '岗位ID',
+    `code`                  varchar(64)       not null                    comment '岗位编码',
+    `name`                  varchar(50)       not null                    comment '岗位名称',
+    `sort`                  smallint          not null                    comment '显示顺序',
+    `status`                bit(1)            DEFAULT b'0' NOT NULL       comment '状态（0正常 1停用）',
+    `created_at`            DATETIME                                      COMMENT '创建时间',
+    `updated_at`            DATETIME                                      COMMENT '更新时间',
+    `deleted_at`            DATETIME          null default null           comment '删除时间',
+    `remark`                varchar(500)      default null                comment '备注',
+    primary key (`id`),
+    UNIQUE KEY `post_code_unique` (`code`)
+) engine=innodb AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci comment = '岗位信息表';
+
+
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

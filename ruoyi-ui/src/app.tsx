@@ -12,6 +12,7 @@ import { errorConfig } from './requestErrorConfig';
 import dayjs from 'dayjs';
 
 const isDev = process.env.NODE_ENV === 'development';
+import logoImage from '@/assets/images/logo.png';
 const loginPath = '/admin/login';
 
 export const rootContainer = (root: JSX.Element) => {
@@ -73,6 +74,7 @@ export const layout   = ({ initialState }: {initialState: any} ) => {
         return menuData.data;
       },
     },
+    logo: logoImage,
     actionsRender: (props: any) => {
       return [
         <div key={'dateString'} style={{ color: '#fff', fontSize: 14 }}>

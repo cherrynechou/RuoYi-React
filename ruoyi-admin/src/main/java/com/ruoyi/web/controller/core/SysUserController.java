@@ -41,6 +41,13 @@ public class SysUserController extends BaseController
         return JsonResponse.success(getConverterTableData(list,formatList), MessageUtils.message("query.success"));
     }
 
+    @PreAuthorize("@securityValidator.hasPermission('system:user:all')")
+    @GetMapping("/user/all")
+    public ResponseData getAllUsers()
+    {
+        return JsonResponse.success(userService.selectUserList(null), MessageUtils.message("query.success"));
+    }
+
     @PreAuthorize("@securityValidator.hasPermission('system:user:add')")
     @PostMapping("/users")
     public ResponseData store(@RequestBody SysUser user)
@@ -48,7 +55,6 @@ public class SysUserController extends BaseController
         if(!StringUtils.isNull(user.getPassword())){
             user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         }
-
         return JsonResponse.success(userService.insertUser(user));
     }
 
@@ -66,7 +72,11 @@ public class SysUserController extends BaseController
     {
         user.setUserId(id);
 
-        userService.checkUserAllowed(user);
+        //超级管理员可修改自己密码
+        if(!user.isAdmin()){
+            userService.checkUserAllowed(user);
+        }
+
         if(!StringUtils.isNull(user.getPassword())){
             user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         }
@@ -85,7 +95,7 @@ public class SysUserController extends BaseController
     }
 
     @PreAuthorize("@securityValidator.hasPermission('system:user:forbidden')")
-    @PatchMapping("/user/{id}/block")
+    @PatchMapping("/user/{id}/forbidden")
     public ResponseData forbiddenUser(@PathVariable(value = "id", required = false) Long id,@RequestBody SysUser user)
     {
         return JsonResponse.success(userService.updateUserProfile(id, user));
